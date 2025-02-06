@@ -11,7 +11,7 @@ app = Flask(__name__)
 chat_history =  [{"role": "system", "content": "你是一个聊天机器人。"}]
 
 @app.route('/')
-def home():
+def home():     
     # 将对话记录传递给模板
     return render_template('chatindex.html', chat_history=chat_history)
 
@@ -23,8 +23,7 @@ def send_message():
     bot_response=None
     try:
         '''
-        使用
-        Open AI方式:  
+        使用        Open AI方式:  
         client = OpenAI(
         # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
         api_key=os.getenv("DASHSCOPE_API_KEY"),
