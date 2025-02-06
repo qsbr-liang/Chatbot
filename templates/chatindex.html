@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>佳宁花园聊天机器人</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f4e3;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        #chat-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #555;
+            z-index: 1000;
+            text-align: center;
+        }
+        #chat-box {
+            height: calc(100vh - 60px); /* 设置聊天框高度为页面高度减去表单高度 */
+            width: calc(100vw * 2 / 3); /* 设置聊天框宽度为页面宽度的三分之二 */
+            overflow-y: auto; /* 当聊天记录超过高度时，显示滚动条 */
+            border: 1px solid #ccc;
+            padding: 50px 20px 10px 20px; /* 增加顶部内边距以容纳标题 */
+            position: fixed;
+            top: 0;
+            right: 0;
+            box-sizing: border-box;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #chat-form {
+            height: 60px; /* 设置表单高度 */
+            background-color: #fff;
+            display: flex;
+            justify-content: flex-end; /* 将内容靠右对齐 */
+            align-items: center;
+            padding: 0 15px;
+            position: fixed;
+            bottom: 0;
+            right: 0; /* 将表单固定在页面右侧 */
+            width: calc(100vw * 2 / 3); /* 设置表单宽度为页面宽度的三分之二 */
+            box-sizing: border-box;
+            border-top: 1px solid #ccc;
+            border-radius: 0 0 10px 0;
+        }
+        #user-input {
+            flex: 1; /* 使输入框占据剩余空间 */
+            margin-right: 10px; /* 输入框与发送按钮之间的间距 */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #chat-form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #8bc34a;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #chat-form button:hover {
+            background-color: #689f38;
+        }
+        #chat-box .user {
+            text-align: right;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        #chat-box .bot {
+            text-align: left;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+        #chat-box .user strong {
+            color: #8bc34a;
+        }
+        #chat-box .bot strong {
+            color: #3f51b5;
+        }
+        #chat-box .user div {
+            background-color: #e8f5e9;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        #chat-box .bot div {
+            background-color: #e3f2fd;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-box">
+        <div id="chat-title">佳宁花园聊天机器人</div>
+        {% for message in chat_history %}
+            <div class="{{ message.role }}">
+                <strong>{{ message.role.capitalize() }}:</strong>
+                <div>{{ message.content }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <form id="chat-form">
+        <input type="text" id="user-input" placeholder="输入你的消息...">
+        <button type="submit">发送</button>
+    </form>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userInput = document.getElementById('user-input').value;
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user_message=${encodeURIComponent(userInput)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const chatBox = document.getElementById('chat-box');
+
+                // 显示用户消息
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.classList.add('user');
+                userMessageDiv.innerHTML = `<strong>你:</strong><div>${userInput}</div>`;
+                chatBox.appendChild(userMessageDiv);
+
+                // 显示机器人回复
+                if (data.response) {
+                    const assistantMessageDiv = document.createElement('div');
+                    assistantMessageDiv.classList.add('bot');
+                    assistantMessageDiv.innerHTML = `<strong>豆沙包:</strong><div>${data.response}</div>`;
+                    chatBox.appendChild(assistantMessageDiv);
+                } else if (data.error) {
+                    console.error(`Error from server: ${data.error}`);
+                    alert(`Error from server: ${data.error}`);
+                }
+
+                // 清空输入框
+                document.getElementById('user-input').value = '';
+
+                // 滚动到聊天框底部
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送消息时出错，请重试。');
+            });
+        });
+    </script>
+</body>
+</html>
