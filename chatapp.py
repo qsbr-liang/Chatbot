@@ -36,7 +36,7 @@ def send_message():
         app_id='b932bccd1fe8430babcb553a9b276604',
         
         messages=chat_history)
-        
+        '''
         response = dashscope.Generation.call(
         api_key=os.getenv('DASHSCOPE_API_KEY'),
         model="qwen-turbo-ft-202501301520-8320", # 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
@@ -46,7 +46,7 @@ def send_message():
             ],
         result_format='message'
         )
-        
+        '''
         '''
         result = client.chat.completions.create(
             model='qwen-turbo-ft-202501291624-e649',
