@@ -23,7 +23,7 @@ def send_message():
     bot_response=None
     try:
         '''
-        使用dev back        Open AI方式:  
+        使用dev back,master update        Open AI方式:  
         client = OpenAI(
         # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
         api_key=os.getenv("DASHSCOPE_API_KEY"),
