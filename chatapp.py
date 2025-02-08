@@ -3,6 +3,14 @@ from flask import Flask, render_template, request, jsonify
 import os
 from openai import OpenAI
 from dashscope import Application
+import logging
+
+# 配置日志记录器
+logging.basicConfig(
+    filename='app.log',  # 日志文件的路径
+    level=logging.DEBUG,  # 日志级别
+    format='%(asctime)s - %(levelname)s - %(message)s'  # 日志格式
+)
 
 app = Flask(__name__)
 
@@ -12,6 +20,7 @@ chat_history =  [{"role": "system", "content": "你是一个聊天机器人。"}
 
 @app.route('/')
 def home():     
+    logging.info("Home page accessed")
     # 将对话记录传递给模板
     return render_template('chatindex.html', chat_history=chat_history)
 
@@ -19,6 +28,7 @@ def home():
 def send_message():
     user_message = request.form['user_message']
     chat_history.append({"role": "user", "content": user_message})
+    logging.info(f"User message received: {user_message}")
     # 这里可以替换为更复杂的逻辑来生成机器人的响应
     bot_response=None
     try:
@@ -58,9 +68,10 @@ def send_message():
         )
         '''
         bot_response=response.output.text
+        logging.info(f"Bot response generated: {bot_response}")
     except Exception as e:
-        print(f"错误信息：{e}")
-        print("请参考文档：https://help.aliyun.com/zh/model-studio/developer-reference/error-code")
+        logging.error(f"错误信息: {e}")
+        logging.error("请参考文档: https://help.aliyun.com/zh/model-studio/developer-reference/error-code")
     
     #bot_response = completion.choices[0].message.content
    
@@ -73,4 +84,5 @@ def send_message():
 
 
 if __name__ == '__main__':
+    logging.info("Starting Flask app")
     app.run(debug=True)
